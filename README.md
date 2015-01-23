@@ -81,7 +81,7 @@ service_running
 ---------------
 If service should be running
 
-- *Default*: true
+- *Default*: based on OS and whether system is a zone or not
 
 service_hasstatus
 -----------------

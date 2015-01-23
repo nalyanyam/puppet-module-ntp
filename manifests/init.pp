@@ -14,7 +14,7 @@ class ntp (
   $service_name        = 'USE_DEFAULTS',
   $config_file         = 'USE_DEFAULTS',
   $driftfile           = 'USE_DEFAULTS',
-  $service_running     = true,
+  $service_running     = 'USE_DEFAULTS',
   $service_hasstatus   = true,
   $service_hasrestart  = true,
   $keys                = 'USE_DEFAULTS',
@@ -44,13 +44,6 @@ class ntp (
     $my_package_latest = $package_latest
   }
 
-  # validate type and convert string to boolean if necessary
-  $service_running_type = type($service_running)
-  if $service_running_type == 'string' {
-    $my_service_running = str2bool($service_running)
-  } else {
-    $my_service_running = $service_running
-  }
 
   # validate type and convert string to boolean if necessary
   $service_hasstatus_type = type($service_hasstatus)
@@ -161,6 +154,14 @@ class ntp (
       }
     }
     'Solaris': {
+      case $::virtual {
+        'zone': {
+          $default_service_running = false
+        }
+        default: {
+          $default_service_running = true
+        }
+      }
       case $::kernelrelease {
         '5.9','5.10': {
           $default_package_name     = [ 'SUNWntp4r', 'SUNWntp4u' ]
@@ -250,6 +251,20 @@ class ntp (
 
   if $keys_real != undef {
     validate_absolute_path($keys_real)
+  }
+
+  if $service_running == 'USE_DEFAULTS' {
+    $service_running_real = $default_service_running
+  } else {
+    $service_running_real = $service_running
+  }
+
+  # validate type and convert string to boolean if necessary
+  $service_running_real_type = type($service_running_real)
+  if $service_running_real_type == 'string' {
+    $my_service_running = str2bool($service_running_real)
+  } else {
+    $my_service_running = $service_running_real
   }
 
   validate_string($restrict_options)
